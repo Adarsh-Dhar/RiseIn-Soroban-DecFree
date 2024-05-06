@@ -5,9 +5,11 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "hardhat/console.sol";
 
-contract NFTVerification is ERC721 {
+contract NFTVerification is ERC721URIStorage  {
     // Mapping from freelancer address to NFT ID
-    mapping(address => uint256) public freelancerNFTs;
+
+    uint256 private tokenId;
+    mapping(address => uint256) public freelancerNFT;
 
     // Events
     event NFTMinted(address indexed freelancer, uint256 indexed tokenId);
@@ -18,16 +20,23 @@ contract NFTVerification is ERC721 {
 
     // Function to mint a new NFT for a freelancer
     function mintNFT(address _freelancer, string memory _metadata) external {
+        
         // Generate a new token ID
+          tokenId ++ ;
         
 
         // Mint the new NFT
+        _mint(_freelancer, tokenId);
 
         // Set metadata for the NFT
+        _setTokenURI(tokenId, _metadata);
 
         // Store the NFT ID for the freelancer
+        freelancerNFT[_freelancer] = tokenId;
+
 
         // Emit NFTMinted event
+        emit NFTMinted(_freelancer, tokenId);
     }
 
     // Function to transfer an NFT to another address
