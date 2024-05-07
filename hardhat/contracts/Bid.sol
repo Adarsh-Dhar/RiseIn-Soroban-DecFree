@@ -1,8 +1,8 @@
 pragma solidity ^0.8.0;
-import "./ProjectContract.sol";
+import "./Project.sol";
 
-contract ProjectBid {
-    ProjectContract public projectContract;
+contract Bid {
+    Project public projectContract;
 
     
     // Struct to represent a bid
@@ -14,6 +14,13 @@ contract ProjectBid {
         
     }
 
+    error WrongTimestamp();
+    error WrongProject();
+    error BidFailed();
+   
+
+   
+
     // Mapping from project ID to array of bids
     mapping(uint256 => Bid[]) public projectBids;
 
@@ -22,7 +29,7 @@ contract ProjectBid {
 
     // Function to place a bid on a project
     function placeBid(uint256 _projectId) external payable {
-        ProjectContract.Project memory project;
+        Project.Project memory project;
          uint256 projectBudget = project.budget;
         require(msg.value <= projectBudget, "Bid amount must be greater than 0");
 

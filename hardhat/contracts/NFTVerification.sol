@@ -15,6 +15,10 @@ contract NFTVerification is ERC721URIStorage  {
     event NFTMinted(address indexed freelancer, uint256 indexed tokenId);
     event NFTTransferred(address indexed from, address indexed to, uint256 indexed tokenId);
 
+    error correctlyMinted();
+    error transferFailed();
+    error nftVerificationFailed();
+
     // Constructor
     constructor(string memory _name, string memory _symbol) ERC721(_name, _symbol) {}
 
