@@ -1,8 +1,10 @@
 pragma solidity ^0.8.0;
 import "./Project.sol";
 
-contract Bid {
-    Project public projectContract;
+contract BidContract {
+    ProjectContract public projectContract;
+
+   
 
     
     // Struct to represent a bid
@@ -29,7 +31,7 @@ contract Bid {
 
     // Function to place a bid on a project
     function placeBid(uint256 _projectId) external payable {
-        Project.Project memory project;
+        ProjectContract.Project memory project;
          uint256 projectBudget = project.budget;
         require(msg.value <= projectBudget, "Bid amount must be greater than 0");
 
@@ -48,6 +50,26 @@ contract Bid {
         emit BidPlaced(_projectId, msg.sender, msg.value, block.timestamp);
     }
 
+    function createBid(uint256 _projectId, address _bidder, uint256 _amount, uint256 _timestamp) external {
+        // Create a new bid object
+        Bid memory newBid = Bid({
+            bidder: _bidder,
+            amount: _amount,
+            timestamp: _timestamp,
+            projectId : _projectId
+        });
+
+        // Add the bid to the project's array of bids
+        projectBids[_projectId].push(newBid);
+
+        // Emit BidPlaced event
+        emit BidPlaced(_projectId, _bidder, _amount, _timestamp);
+    }
+
+    function getBidStruct(uint256 _projectId) public view returns (Bid[] memory) {
+        return projectBids[_projectId];
+    }
+
     // Function to get the number of bids for a project
     function getNumBids(uint256 _projectId) external view returns (uint256) {
         return projectBids[_projectId].length;
@@ -58,4 +80,24 @@ contract Bid {
         Bid storage bid = projectBids[_projectId][_index];
         return (bid.bidder, bid.amount, bid.timestamp);
     }
+
+    
+
+    function getAllBids(uint256 _projectId) external view returns (Bid[] memory) {
+        uint256 numBids = projectBids[_projectId].length;
+        Bid[] memory bidderInfos = new Bid[](numBids);
+
+        for (uint256 i = 0; i < numBids; i++) {
+            Bid storage bid = projectBids[_projectId][i];
+            bidderInfos[i] = Bid({
+                bidder: bid.bidder,
+                amount: bid.amount,
+                timestamp: bid.timestamp,
+                projectId : _projectId
+            });
+        }
+
+        return bidderInfos;
+    }
+
 }

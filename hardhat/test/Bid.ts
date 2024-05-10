@@ -1,63 +1,46 @@
-import { ethers } from 'hardhat';
 import { expect } from 'chai';
-const { loadFixture } = require("@nomicfoundation/hardhat-network-helpers");
+import { ethers } from 'hardhat';
+const { waffle } = require('ethereum-waffle');
 
-const projectContractTest = () => {
-    describe("Bid", async function runEveryTime() {
-        it("should revert if freelancer has no balance", async function () {
+describe('BidContract', function () {
+  let bidContract: any;
+  let projectContract:any;
+  let owner : any;
 
-            const amount = ethers.constants.Zero;
+  beforeEach(async function () {
+    [owner] = await ethers.getSigners();
 
-            const BidContract = await ethers.getContractFactory("Bid");
-            const bid = await BidContract.deploy();
-            const ProjectContract = await ethers.getContractFactory("Project");
-            const project = await ProjectContract.deploy();
+  // Deploy ProjectContract
+  const ProjectContractFactory = await ethers.getContractFactory('ProjectContract');
+  const projectContract = await ProjectContractFactory.deploy();
 
-            return {bid, project};
-        })
-        describe("Deployment", async function () {
-            it("should revert if freelancer has no balance", async function () {
-                const { bid } = await loadFixture(runEveryTime);
+  // Deploy BidContract
+  const BidContractFactory = await ethers.getContractFactory('BidContract');
+  bidContract = await BidContractFactory.deploy(projectContract.address);
 
-                const amount = ethers.constants.Zero;
+  describe('getBidStruct', function () {
+    it('should return an empty array if no bids have been placed', async function () {
+      const projectId = 0;
+      const bids = await bidContract.getBidStruct(projectId);
+      expect(bids).to.be.an('array').that.is.empty;
+    });
 
-                // Assert that the balance of the bidder address is equal to 0
-                try {
-                    await expect(await bid.bidder.balance).to.equal(amount);
-                } catch (error) {
-                    // If the balance is equal to 0, the test should revert
-                    expect(error).to.throw("Balance is equal to 0");
-                }
-            })
-        })
+    it('should return an array of bids if bids have been placed', async function () {
+      const projectId = 0;
+      const bidAmount = ethers.utils.parseEther('1.0');
 
-        describe("Deployment", async function () {
-            it("should check it the timestamp is valid", async function () {
-                const { bid } = await loadFixture(runEveryTime);
+      // Place a bid
+      await bidContract.placeBid(projectId, { value: bidAmount });
 
-                const currentTimestamp = Math.floor(Date.now() / 1000);
-                const bidderTimestamp = bid.timestamp;
+      // Get the bid struct
+      const bids = await bidContract.getBidStruct(projectId);
 
-                expect(bidderTimestamp).to.be.gte(currentTimestamp, "Bidder's timestamp is earlier than the current timestamp");
-
-                
-            })
-        })
-
-        describe("Deployment",async function(){
-            it("should check if the project exists",async function(){
-                const { project,bid } = await loadFixture(runEveryTime);
-
-                const projectId = project.projectId;
-
-                const checkProjectId = bid.projectId;
-
-                expect(checkProjectId).to.equal(projectId,"Project does not exist");
-
-                
-            })
-        })
-
-        
-    })
-}
+      expect(bids).to.be.an('array').that.has.lengthOf(1);
+      expect(bids[0].bidder).to.equal(owner.address);
+      expect(bids[0].amount).to.equal(bidAmount);
+      expect(bids[0].timestamp).to.be.a('big number');
+      expect(bids[0].projectId).to.equal(projectId);
+    });
+  });
+});
+})

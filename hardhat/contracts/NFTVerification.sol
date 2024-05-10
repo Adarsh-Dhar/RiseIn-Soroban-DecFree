@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "hardhat/console.sol";
 
-contract NFTVerification is ERC721URIStorage  {
+contract NFTVerificationContract is ERC721URIStorage  {
     // Mapping from freelancer address to NFT ID
 
     uint256 private tokenId;

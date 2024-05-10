@@ -1,7 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
+import "./Bid.sol";
 
-contract Project {
+contract ProjectContract {
+
+    BidContract public bidContract;
+
+    constructor(){
+        bidContract = new BidContract();
+    }
     // Struct to represent a project
     struct Project {
         uint256 id;
@@ -11,14 +18,13 @@ contract Project {
         string description;
         uint256 budget;
         uint256 deadline;
-        string[] skills;
-        // Add more project attributes as needed
-        // e.g., status, assignedFreelancer, etc.
+        
+        
     }
 
-    error ProjectNotFound(uint256 projectId);
-    error ProjectFailed();
-    error deadlineWrong(uint256 deadline);
+     mapping(uint256 => Project[]) public projectContracts;
+
+    
 
     
 
@@ -41,10 +47,7 @@ contract Project {
         }
     }
 
-    // Revert if the client has an unassigned project
-    if (hasUnassignedProject) {
-        revert ProjectFailed(); 
-    }
+   
 
     // Create a new project
     Project memory newProject = Project({
@@ -54,8 +57,8 @@ contract Project {
         title: _title,
         description: _description,
         budget: _budget,
-        deadline: _deadline,
-        skills: new string[](0)
+        deadline: _deadline
+        
         // Initialize other project attributes as needed
     });
 
@@ -67,6 +70,49 @@ contract Project {
 }
 
 
+   // Function to get a project by its ID
+
+  function showAllBids(uint256 _projectId) external view returns(BidContract.Bid[] memory){
+        return bidContract.getAllBids(_projectId) ;
+  }
+
     
 
+
+    function assignFreelancerFromBidders(uint256 _projectId, uint256 _bidderIndex) external {
+        require(_projectId < projects.length, "Invalid project ID");
+        Project storage project = projects[_projectId];
+        require(project.client == msg.sender, "Only the client can assign a freelancer");
+        require(project.freelancer == address(0), "Freelancer already assigned");
+
+        BidContract.Bid[] memory bids = bidContract.getAllBids(_projectId);
+        
+        require(_bidderIndex < bids.length, "Invalid bidder index");
+
+        project.freelancer = bids[_bidderIndex].bidder;
+        emit ProjectAssigned(_projectId, bids[_bidderIndex].bidder);
+    }
+
+
+
+    function getAllProjects(uint256 _id) external view returns(Project[] memory){
+        uint256 numProjects = projectContracts[_id].length;
+        Project[] memory projectss = new Project[](numProjects);
+
+        for(uint256 i = 0; i < numProjects; i++){
+            Project storage project = projectContracts[_id][i];
+            projectss[i] = Project({
+                id: project.id,
+                client: project.client,
+                freelancer: project.freelancer,
+                title: project.title,
+                description: project.description,
+                budget: project.budget,
+                deadline: project.deadline
+                
+            });
+        }
+    }
+
 }
+
