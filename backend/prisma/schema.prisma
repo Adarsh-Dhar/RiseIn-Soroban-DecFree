@@ -1,0 +1,93 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Project{
+  id      Int  @id @default(autoincrement())
+  title    String
+  description String
+  price    Int
+  Deadline Int
+  assigned Boolean @default(false)
+  done Boolean @default(false)
+  bid Bid[]
+  clientId Int
+  client Client   @relation(fields: [clientId], references: [id])
+ 
+  submissionCache SubmissionCache[]
+
+}
+
+model Bid{
+  id      Int  @id @default(autoincrement())
+  price    Int
+  deadline Int
+  accepted Boolean @default(false)
+  projectId Int
+  project  Project   @relation(fields: [projectId], references: [id])
+
+  freelancerId Int
+ 
+  done Boolean @default(false)
+  freelancer Freelancer   @relation(fields: [freelancerId], references: [id])
+  submission Submission[]
+  
+}
+
+model Client{
+  id       Int  @id @default(autoincrement())
+  address   String
+  project Project[]
+  
+}
+
+model Freelancer{
+  id       Int  @id @default(autoincrement())
+  address   String
+  github String
+  
+  bid Bid[]
+  
+}
+
+model Worker{
+  id       Int  @id @default(autoincrement())
+  address   String
+  submission Submission[]
+  
+  pendingAmount Int
+  lockedAmount Int
+}
+
+
+
+
+model Submission{
+  id      Int  @id @default(autoincrement())
+  workerId Int
+  worker Worker   @relation(fields: [workerId], references: [id])
+  answer Boolean
+  bidId Int
+  bid Bid   @relation(fields: [bidId], references: [id])
+  amount String
+  @@unique([workerId, bidId])
+}
+
+model SubmissionCache{
+  id     Int  @id @default(autoincrement())
+  projectId Int
+  project Project   @relation(fields: [projectId], references: [id])
+  trueCount Int
+  falseCount Int
+}

@@ -23,7 +23,7 @@ describe('NFTVerificationContract', function () {
       await nftContract.mintNFT(freelancer.address, metadata);
 
       const tokenId = await nftContract.freelancerNFT(freelancer.address);
-    //   expect(tokenId).to.be.gt(0);
+    
 
       const tokenOwner = await nftContract.ownerOf(tokenId);
       expect(tokenOwner).to.equal(freelancer.address);
