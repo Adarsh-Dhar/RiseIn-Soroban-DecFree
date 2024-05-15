@@ -5,20 +5,9 @@ import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient() 
 import { JWT_SECRET } from '..';
 
-import AWS from "aws-sdk"
-import {S3Client , GetObjectCommand, PutObjectCommand} from "@aws-sdk/client-s3"
-import { getSignedUrl} from '@aws-sdk/s3-request-presigner';
-import { clientMiddleware } from '../middlewares/client';
-import { create } from 'domain';
 
-const s3Client = new S3Client({
-    credentials : {
-        accessKeyId : "AKIA47CRWCJDGDFRESXP",
-        secretAccessKey : "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"
-    },
-    region : "us-east-1"
-    
-})
+import { clientMiddleware } from '../middlewares/client';
+
 
 
 
