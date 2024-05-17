@@ -18,17 +18,9 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const client_1 = require("@prisma/client");
 const prisma = new client_1.PrismaClient();
 const __1 = require("..");
-const client_s3_1 = require("@aws-sdk/client-s3");
 const client_2 = require("../middlewares/client");
-const s3Client = new client_s3_1.S3Client({
-    credentials: {
-        accessKeyId: "AKIA47CRWCJDGDFRESXP",
-        secretAccessKey: "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"
-    },
-    region: "us-east-1"
-});
 router.post("/signin", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const walletAddress = "0xf76daC24BaEf645ee0b3dfAc1997c6b838eF280D";
+    const walletAddress = "Adafrs";
     const existingUser = yield prisma.freelancer.findFirst({
         where: {
             address: walletAddress

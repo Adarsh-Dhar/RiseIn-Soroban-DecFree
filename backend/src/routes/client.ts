@@ -5,8 +5,12 @@ import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient() 
 import { JWT_SECRET } from '..';
 
-
+import AWS from "aws-sdk"
+import {S3Client , GetObjectCommand, PutObjectCommand} from "@aws-sdk/client-s3"
+import { getSignedUrl} from '@aws-sdk/s3-request-presigner';
 import { clientMiddleware } from '../middlewares/client';
+import { create } from 'domain';
+
 
 
 
@@ -14,7 +18,7 @@ import { clientMiddleware } from '../middlewares/client';
 
 
 router.post("/signin",async (req, res) => {
-   const walletAddress = "0xf76daC24BaEf645ee0b3dfAc1997c6b838eF280D"
+   const walletAddress = "Adafrs"
    
    const existingUser = await prisma.freelancer.findFirst({
     where: {

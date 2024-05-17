@@ -94,7 +94,7 @@ router.post("/submission", worker_1.workerMiddleware, (req, res) => __awaiter(vo
             message: "Bid not found"
         });
     }
-    const totalPool = bid.id / 10;
+    const totalPool = bid.price / 10;
     const amount = (totalPool / TOTAL_SUBMISSIONS).toString();
     const submission = yield prisma.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
         const submission = yield prisma.submission.create({
