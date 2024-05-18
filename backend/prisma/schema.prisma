@@ -6,6 +6,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  binaryTargets = ["native", "darwin"]
 }
 
 datasource db {
@@ -31,14 +32,15 @@ model Project{
 
 model Bid{
   id      Int  @id @default(autoincrement())
+  repo1      String
+  repo2     String
+  repo3      String
   price    Int
   deadline Int
   accepted Boolean @default(false)
   projectId Int
   project  Project   @relation(fields: [projectId], references: [id])
-
   freelancerId Int
- 
   done Boolean @default(false)
   freelancer Freelancer   @relation(fields: [freelancerId], references: [id])
   submission Submission[]
@@ -55,7 +57,6 @@ model Client{
 model Freelancer{
   id       Int  @id @default(autoincrement())
   address   String
-  github String
   
   bid Bid[]
   
@@ -68,6 +69,7 @@ model Worker{
   
   pendingAmount Int
   lockedAmount Int
+  payout Payouts[]
 }
 
 
@@ -90,4 +92,19 @@ model SubmissionCache{
   project Project   @relation(fields: [projectId], references: [id])
   trueCount Int
   falseCount Int
+}
+
+model Payouts{
+  id    Int  @id @default(autoincrement())
+  workerId Int
+  worker Worker   @relation(fields: [workerId], references: [id])
+  amount Int
+  signature String
+  status TxnStatus
+}
+
+enum TxnStatus{
+  PENDING
+  SUCCESS
+  FAILED
 }

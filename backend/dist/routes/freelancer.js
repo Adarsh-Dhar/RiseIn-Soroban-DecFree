@@ -21,15 +21,14 @@ const __1 = require("..");
 const freelancer_1 = require("../middlewares/freelancer");
 router.post("/signin", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const walletAddress = "0xf76daC24BaEf645ee0b3dfAc1997c6b838eF280D";
-    const github = req.body.github;
-    const existingFreelancer = yield prisma.freelancer.findFirst({
+    const existingfreelancer = yield prisma.freelancer.findFirst({
         where: {
-            address: walletAddress,
+            address: walletAddress
         }
     });
-    if (existingFreelancer) {
+    if (existingfreelancer) {
         const token = jsonwebtoken_1.default.sign({
-            freelancerId: existingFreelancer.id,
+            freelancerId: existingfreelancer.id,
         }, __1.JWT_SECRET);
         res.json({
             token
@@ -37,9 +36,9 @@ router.post("/signin", (req, res) => __awaiter(void 0, void 0, void 0, function*
     }
     else {
         const freelancer = yield prisma.freelancer.create({
+            // @ts-ignore
             data: {
                 address: walletAddress,
-                github: github
             }
         });
         const token = jsonwebtoken_1.default.sign({
@@ -51,13 +50,17 @@ router.post("/signin", (req, res) => __awaiter(void 0, void 0, void 0, function*
     }
 }));
 //get all projects
-router.get("/projects", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const projects = yield prisma.project.findMany();
+router.get("/availableProjects", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const projects = yield prisma.project.findMany({
+        where: {
+            assigned: false
+        }
+    });
     res.json(projects);
 }));
 //post bid
 router.post("/bid", freelancer_1.freelancerMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { projectId, price, deadline } = req.body;
+    const { projectId, price, deadline, repo1, repo2, repo3 } = req.body;
     //@ts-ignore
     const freelancerId = req.freelancerId;
     const bid = yield prisma.bid.create({
@@ -68,6 +71,9 @@ router.post("/bid", freelancer_1.freelancerMiddleware, (req, res) => __awaiter(v
             projectId: projectId,
             freelancerId: freelancerId,
             accepted: false,
+            repo1: repo1,
+            repo2: repo2,
+            repo3: repo3,
         }
     });
     res.json(bid);

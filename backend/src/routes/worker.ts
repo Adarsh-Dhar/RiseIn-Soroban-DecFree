@@ -45,40 +45,37 @@ router.post("/signin",async  (req, res) => {
    }
 })
 
-//get the github
-router.get("/bid",workerMiddleware ,async (req, res) => {
+router.get("/nextBid",workerMiddleware ,async (req, res) => {
     const workerId = req.body.workerId
-   
+
     const bid = await prisma.bid.findFirst({
-      where : {
-        done : false,
-        submission : {
-            none : {
-                workerId : workerId
-            
+        where : {
+            done : false,
+            submission : {
+                none : {
+                    workerId : workerId,
+                   
+                }
             }
         }
-      }
-      
     })
     if(!bid){
-        res.status(411).json({
+        return res.status(400).json({
             message : "No more bid for you to review"
         })
-    }else{
-        const project = await prisma.project.findFirst({
-            where : {
-                id : bid.projectId
-            }
-
-        })
-        res.json(project)
-        res.json(bid)
-
     }
+    const project = await prisma.project.findFirst({
+        where : {
+            id : bid.projectId
+        }
+    })
 
-
+    res.json(project)
+    res.json(bid)
 })
+
+
+
 
 //submission
 router.post("/submission",workerMiddleware ,async (req, res) => {
