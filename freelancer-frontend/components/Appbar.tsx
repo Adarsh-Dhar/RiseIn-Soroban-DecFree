@@ -1,14 +1,18 @@
-import React from 'react';
+"use client"
+import Button from "./Button";
+import React from "react";
+import axios from "axios";
+import { BACKEND_URL } from "@/utils";
 
-const Appbar: React.FC = () => {
-    
+export const Appbar = () => {
+  const handleClick = () => {
+    // Handle button click
+    const response = axios.get(`${BACKEND_URL}/v1/freelancer/availableProjects`);
+  };
 
-    return (
-        <div>
-            <input type="text" placeholder="Github" className="border border-gray-300 rounded-md p-2" />
-            <button>Connect Wallet</button>
-        </div>
-    );
+  return (
+    <div>
+      <Button text="connect wallet" onClick={handleClick} />
+    </div>
+  );
 };
-
-export default Appbar;

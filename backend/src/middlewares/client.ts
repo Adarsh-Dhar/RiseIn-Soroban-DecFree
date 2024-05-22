@@ -8,11 +8,11 @@ export function clientMiddleware(req:Request,res:Response,next:NextFunction){
     try{
         const decoded = jwt.verify(clientHeader,JWT_SECRET)
         // @ts-ignore
-        console.log(decoded.userId)
+        console.log(decoded)
         // @ts-ignore
-        if(decoded.userId){
+        if(decoded.clientId){
             // @ts-ignore
-            req.clientId = decoded.userId
+            req.clientId = decoded.clientId
             return next()
         }else{
             res.status(401).json({

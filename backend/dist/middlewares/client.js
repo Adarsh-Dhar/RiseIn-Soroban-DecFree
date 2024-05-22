@@ -12,11 +12,11 @@ function clientMiddleware(req, res, next) {
     try {
         const decoded = jsonwebtoken_1.default.verify(clientHeader, __1.JWT_SECRET);
         // @ts-ignore
-        console.log(decoded.userId);
+        console.log(decoded);
         // @ts-ignore
-        if (decoded.userId) {
+        if (decoded.clientId) {
             // @ts-ignore
-            req.clientId = decoded.userId;
+            req.clientId = decoded.clientId;
             return next();
         }
         else {

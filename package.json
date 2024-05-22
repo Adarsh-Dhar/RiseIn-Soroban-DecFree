@@ -10,12 +10,15 @@
   },
   "dependencies": {
     "@coin98t/wallet-adapter-metamask-ethereum": "^0.0.77",
+    "@stellar/freighter-api": "^2.0.0",
     "@types/cors": "^2.8.17",
+    "axios": "^1.6.8",
     "cors": "^2.8.5",
     "ethers": "^6.12.1",
     "next": "14.2.3",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "recoil": "^0.7.7"
   },
   "devDependencies": {
     "@types/node": "^20",

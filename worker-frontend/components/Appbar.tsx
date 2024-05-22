@@ -1,15 +1,16 @@
-import React from 'react';
+"use client"
+import Button from "./Button";
+import React from "react";
 
-const Appbar: React.FC = () => {
-    const handleConnectWallet = () => {
-        // Add your logic for connecting the wallet here
-    };
+export const Appbar = () => {
+  const handleClick = () => {
+    // Handle button click
+    console.log("connect to wallet");
+  };
 
-    return (
-        <div>
-            <button onClick={handleConnectWallet}>Connect Wallet</button>
-        </div>
-    );
+  return (
+    <div>
+      <Button text="connect wallet" onClick={handleClick} />
+    </div>
+  );
 };
-
-export default Appbar;

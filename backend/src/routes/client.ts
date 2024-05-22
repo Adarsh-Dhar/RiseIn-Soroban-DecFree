@@ -44,5 +44,50 @@ router.post("/signin",async  (req, res) => {
 
 })
 
+router.post("/projects",clientMiddleware,async (req, res) => {
+    const {title,description,price,Deadline} = req.body
+    //@ts-ignore
+    const clientId = req.clientId
+    const project = await prisma.project.create({
+        
+        // @ts-ignore
+        data: {
+            clientId,
+            title,
+            description,
+            price,
+            Deadline,      
+        }
+    })
+    res.json(project)
+})
+
+router.get("/myProjects",clientMiddleware,async (req, res) => {
+    //@ts-ignore
+    const clientId = req.clientId
+    const projects = await prisma.project.findMany({
+        where: {
+            clientId
+        }
+    })
+
+    res.json(projects)
+})
+
+router.get("/bids", clientMiddleware, async (req, res) => {
+    const projectId = Number(req.query.projectId);
+
+    const bids = await prisma.bid.findMany({
+        where: {
+            projectId
+        }
+    });
+
+    res.json(bids);
+});
+
+
+export default router;
+
  
 

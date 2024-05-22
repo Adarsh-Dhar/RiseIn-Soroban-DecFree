@@ -1,13 +1,13 @@
-import Image from "next/image";
-import Appbar from "../components/Appbar";
-import SelectProject from "@/components/SelectProject";
+import Card from "@/components/Cards";
+import {Appbar} from "../components/Appbar";
+import Bid from "../components/Bids";
+import { Project } from "@/components/SelectProject";
 
 export default function Home() {
   return (
-    <div>
- <Appbar />
-   <SelectProject />
-    </div>
-  
+    <main>
+      <Appbar />
+      <Project />
+    </main>
   );
 }

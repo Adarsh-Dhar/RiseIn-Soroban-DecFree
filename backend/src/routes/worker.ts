@@ -5,6 +5,7 @@ import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 import { JWT_SECRET } from '..';
 import { workerMiddleware } from '../middlewares/worker';
+import { getNextBid } from '../db';
 
 const TOTAL_SUBMISSIONS = 100
 
@@ -48,30 +49,24 @@ router.post("/signin",async  (req, res) => {
 router.get("/nextBid",workerMiddleware ,async (req, res) => {
     const workerId = req.body.workerId
 
-    const bid = await prisma.bid.findFirst({
-        where : {
-            done : false,
-            submission : {
-                none : {
-                    workerId : workerId,
-                   
-                }
-            }
-        }
-    })
+
+    const bid = getNextBid(workerId)
     if(!bid){
         return res.status(400).json({
             message : "No more bid for you to review"
         })
     }
-    const project = await prisma.project.findFirst({
-        where : {
-            id : bid.projectId
-        }
+   
+if(!bid){
+    res.status(411).json({
+       message : "No more bid for you to review"
     })
-
-    res.json(project)
-    res.json(bid)
+}else{
+    res.json({
+        bid
+    })
+}
+    
 })
 
 
@@ -83,44 +78,54 @@ router.post("/submission",workerMiddleware ,async (req, res) => {
 
     const workerId = req.body.workerId
 
-    const bid = await prisma.bid.findFirst({
-        where : {
-            id : body.bidId
-        }
-    })
-    if(!bid){
+    const bid = await getNextBid(workerId)
+    if(!bid || bid.id !== body.bidId){
         return res.status(400).json({
-            message : "Bid not found"
+            message : "Invalid bid"
         })
+
+
     }
 
-    const totalPool = bid.price/10
-    const amount = (totalPool/TOTAL_SUBMISSIONS).toString()
+    const pool = bid.price / 10
 
-    const submission = await prisma.$transaction(async tx => {
-        const submission = await prisma.submission.create({
-            // @ts-ignore
+    const amount = pool / TOTAL_SUBMISSIONS
+
+    const submission = prisma.$transaction(async tx => {
+        const submission = await tx.submission.create({
             data : {
+                answer : req.body.answer,
                 workerId : workerId,
-                bidId : body.bidId,
-                
-                amount,
+                //@ts-ignore
+                bidId : bid.id,
+                //@ts-ignore
+                amount : amount
             }
         })
 
-        await prisma.worker.update({
+        await tx.worker.update({
             where : {
                 id : workerId
-            },data : {
+            },
+            data : {
                 pendingAmount : {
-                     increment : Number(amount)
+                    increment : amount
                 }
             }
-            })
         })
+        
 
         return submission
     })
+
+    
+
+    const nextBid = await getNextBid(workerId)
+    res.json({
+        nextBid,
+        
+    })
+})
 
 router.get("/balance",workerMiddleware ,async (req, res) => {
     const workerId = req.body.workerId
@@ -139,10 +144,50 @@ lockedAmount : worker.lockedAmount
     })
 })
 
-    
+router.post("/payout",workerMiddleware ,async (req, res) => {
+    // @ts-ignore
+    const workerId = req.workerId
+    const worker = await prisma.worker.findFirst({
+        where : {
+            id : Number(workerId)
+        }
+    })
 
-   
+    if(!worker) {
+        return res.status(400).json({
+            message : "Invalid worker"
+        })
+    }
 
+    const address = worker.address
+
+    const txId = "0x1234567890"
+
+    await prisma.$transaction(async tx => {
+        await tx.worker.update({
+            where : {
+                id : workerId
+            },
+            data : {
+                pendingAmount : {
+                    decrement : worker.pendingAmount
+                },
+                lockedAmount : {
+                    increment : worker.pendingAmount
+            }
+        }
+        })
+
+        await tx.payouts.create({
+            data : {
+                amount : worker.pendingAmount,
+                signature : txId,
+                workerId : workerId,
+                status : "PENDING"
+            }
+        })
+    })
+})
 
 
 export default router;
