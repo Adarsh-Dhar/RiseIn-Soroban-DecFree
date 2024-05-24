@@ -19,8 +19,8 @@ const client_1 = require("@prisma/client");
 const prisma = new client_1.PrismaClient();
 const __1 = require("..");
 const client_2 = require("../middlewares/client");
-router.post("/signin", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const walletAddress = "0xf76daC24BaEf645ee0b3dfAc1997c6b838eF280D";
+router.post("/signin/:walletAddress", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const walletAddress = req.params.walletAddress;
     const existingclient = yield prisma.client.findFirst({
         where: {
             address: walletAddress
