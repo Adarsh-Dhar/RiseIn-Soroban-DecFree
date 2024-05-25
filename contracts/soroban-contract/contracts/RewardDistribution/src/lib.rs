@@ -1,3 +1,6 @@
+#![no_std]
+use soroban_sdk::{contract, contractimpl, contracttype, Address, Env};
+
 #[contracttype]
 pub enum DataKey{
     Owner(Address),
