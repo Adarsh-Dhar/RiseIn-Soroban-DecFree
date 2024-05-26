@@ -45,11 +45,12 @@ export const Appbar = () => {
     connectWallet()
   }, [])
 
+ 
+
   
   return (
     <div>
       <Button onclick={connectWallet} text="Connect Wallet" />
-
     </div>
   )
 }

@@ -54,14 +54,13 @@ router.get("/availableProjects",async (req, res) => {
 
 //post bid
 router.post("/bid",freelancerMiddleware ,async (req, res) => {
-    const {projectId,price,deadline,repo1,repo2,repo3} = req.body
+    const {projectId,repo1,repo2,repo3} = req.body
     //@ts-ignore
     const freelancerId = req.freelancerId
     const bid = await prisma.bid.create({
         // @ts-ignore
         data: {
-            price : price,
-            deadline : deadline,
+            
             projectId : projectId,
             freelancerId : freelancerId,
             accepted : false,

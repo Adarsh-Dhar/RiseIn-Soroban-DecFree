@@ -8,6 +8,7 @@ export default function Home() {
     <main>
       <Appbar />
       <Project />
+      <Card />
     </main>
   );
 }
