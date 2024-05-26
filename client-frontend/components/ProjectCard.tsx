@@ -3,8 +3,8 @@ import React, { use } from 'react';
 import Button from './Button';
 import axios from 'axios';
 import { BACKEND_URL } from '@/utils';
-import { projectIdAtom } from '@/store/atoms/Project';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { projectIdAtom } from '@/store/atoms/ProjectId';
 interface CardProps {
     title: string;
     description: string;
@@ -14,17 +14,13 @@ interface CardProps {
 
 const Card = ({title , description , price, deadline} : CardProps) => {
     const projectId = useRecoilValue(projectIdAtom)
-    const setProjectId = useSetRecoilState(projectIdAtom)
+    
     const handleClick = async () => {
-        const response = await axios.post(`${BACKEND_URL}/selectProject`,{
+        const response = await axios.get(`${BACKEND_URL}/bids`,{
             data : {
-                title : title,
-                description : description,
-                price : price,
-                deadline : deadline
+                projectId : projectId
             }
         })
-        setProjectId(response.data)
     }
 
     
@@ -37,7 +33,7 @@ const Card = ({title , description , price, deadline} : CardProps) => {
     <p className='text-sm font-medium'>{price}</p>
     <p className='text-sm font-medium'>{deadline}</p>
 
-   <Button onClick ={handleClick} text='Select Project'/>
+   <Button onclick ={handleClick} text='See All Bids'/>
 </div>
 
     );

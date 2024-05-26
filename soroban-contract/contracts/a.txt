@@ -1,0 +1,17 @@
+CD5HN4DPS4BQJS2OWLVUHC3HEOLSB46ELLJT7W3J7VTIR3SWSAPWRBVJ
+
+soroban contract deploy \
+  --wasm-hash CDA6TLFBDZAFUUVLIGENSBXVRBMM5TFKVPCU4OQHRJM7CUZD6VTLJ7FH \
+  --source alice \
+  --network testnet
+
+  soroban contract invoke \
+  --id CD5HN4DPS4BQJS2OWLVUHC3HEOLSB46ELLJT7W3J7VTIR3SWSAPWRBVJ \
+  --source alice \
+  --network testnet \
+  -- \
+
+  soroban contract bindings typescript \
+  --network testnet \
+  --contract-id CD5HN4DPS4BQJS2OWLVUHC3HEOLSB46ELLJT7W3J7VTIR3SWSAPWRBVJ \
+  --output-dir packages/DecFree

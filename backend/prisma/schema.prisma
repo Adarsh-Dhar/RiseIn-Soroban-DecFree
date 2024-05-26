@@ -32,15 +32,14 @@ model Project{
 
 model Bid{
   id      Int  @id @default(autoincrement())
-  repo1      String
-  repo2     String
-  repo3      String
-  price    Int
-  deadline Int
+  repo     String
+  
+  
   accepted Boolean @default(false)
   projectId Int
   project  Project   @relation(fields: [projectId], references: [id])
   freelancerId Int
+  maxVote Boolean
   done Boolean @default(false)
   freelancer Freelancer   @relation(fields: [freelancerId], references: [id])
   submission Submission[]

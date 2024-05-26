@@ -52,9 +52,27 @@ router.get("/availableProjects",async (req, res) => {
     res.json(projects)
 })
 
+//select project
+router.get("/selectProject",freelancerMiddleware ,async (req, res) => {
+    const {title,description,price,deadline} = req.body
+    //@ts-ignore
+    const freelancerId = req.freelancerId
+    const project = await prisma.project.findFirst({
+        where: {
+             title,
+                description,
+                price,
+                // @ts-ignore
+                deadline 
+        }
+        
+    })
+    res.json(project?.id)
+})
+
 //post bid
 router.post("/bid",freelancerMiddleware ,async (req, res) => {
-    const {projectId,repo1,repo2,repo3} = req.body
+    const {projectId,repo} = req.body
     //@ts-ignore
     const freelancerId = req.freelancerId
     const bid = await prisma.bid.create({
@@ -64,9 +82,8 @@ router.post("/bid",freelancerMiddleware ,async (req, res) => {
             projectId : projectId,
             freelancerId : freelancerId,
             accepted : false,
-            repo1 : repo1,
-            repo2 : repo2,
-            repo3 : repo3,
+            repo : repo,
+            
             
             
         }

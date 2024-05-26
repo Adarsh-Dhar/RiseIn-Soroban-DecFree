@@ -1,6 +1,5 @@
 import Card from "@/components/Cards";
 import {Appbar} from "../components/Appbar";
-import Bid from "../components/Bids";
 import { Project } from "@/components/SelectProject";
 
 export default function Home() {
@@ -8,7 +7,7 @@ export default function Home() {
     <main>
       <Appbar />
       <Project />
-      <Card />
+      
     </main>
   );
 }

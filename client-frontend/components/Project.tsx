@@ -8,9 +8,9 @@ import { BACKEND_URL } from '@/utils';
 
 const Project = () => {
 
-    const handleOnlick = () => {
+    const handleClick = () => {
       try{
-        const response = axios.post(`${BACKEND_URL}/v1/client/projects`,{
+        const response = axios.post(`${BACKEND_URL}/projects`,{
           title,
           description,
           price,
@@ -103,7 +103,7 @@ const Project = () => {
         </label>
         <div className="relative">
 
-        <Button onclick={handleOnlick} text='publish project'/>
+        <Button onclick={handleClick} text='publish project'/>
         </div>
 
           </div>

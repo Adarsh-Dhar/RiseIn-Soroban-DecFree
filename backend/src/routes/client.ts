@@ -7,8 +7,8 @@ import { JWT_SECRET } from '..';
 import { clientMiddleware } from '../middlewares/client';
 import { Token } from 'aws-sdk';
 
-router.post("/signin/:walletAddress",async  (req, res) => {
-    const walletAddress = req.params.walletAddress as string
+router.post("/signin",async  (req, res) => {
+    const walletAddress = req.body as string
    
    const existingclient = await prisma.client.findFirst({
     where: {
@@ -85,6 +85,23 @@ router.get("/bids", clientMiddleware, async (req, res) => {
 
     res.json(bids);
 });
+
+//select bid
+router.put("/selectBid", clientMiddleware, async (req, res) => {
+    const {bidId} = req.body
+    //@ts-ignore
+    const clientId = req.clientId
+    const bid = await prisma.bid.findFirst({
+        where: {
+            id: bidId
+        },
+        //@ts-ignore
+        update : {
+            accepted : true
+        }
+    })
+    res.json(bid)
+})
 
 
 export default router;

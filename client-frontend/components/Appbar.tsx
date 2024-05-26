@@ -1,49 +1,37 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, use } from "react"
 import Button from "./Button"
-import { isConnected, requestAccess} from "@stellar/freighter-api"
+import {retrievePublicKey, checkConnection, userSignTransaction} from "./Freighter"
 import axios from "axios"
 import { BACKEND_URL } from "@/utils"
+import { get } from "http"
+import { publicKeyAtom } from "@/store/atoms/Key";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 
 export const Appbar = () => {
-  const [publicKey, setPublicKey] = useState("")
-  const [signedXdr, setSignedXdr] = useState("")
-  const [error, setError] = useState(null)
+  const publicKey = useRecoilValue(publicKeyAtom)
+  const getPublicKey = useSetRecoilState(publicKeyAtom)
+  const [connect, getConnected] = useState("Connect")
+ 
 
   
-    const connectWallet = async () => {
-      if (!isConnected()) {
-        // @ts-ignore
-        setError("Freighter extension is not installed or connected.")
-        return
-      }
-
-      try {
-        const pubKey = await requestAccess()
-        setPublicKey(pubKey)
-        console.log("User's public key:", pubKey)
-        console.log("hello")
-      } catch (e) {
-        // @ts-ignore
-        setError(e)
-      }
-
-
-      try{
-        const response = await axios.post(`${BACKEND_URL}/client/signin/${publicKey}`)
-        console.log(response.data)
-        console.log("hi")
-
-      }catch(e){
-        // @ts-ignore
-        console.log(e)
-      
-      }
+    async function connectWallet() {
+         if (await checkConnection()) {
+            
+            getConnected("Connected");
+            getPublicKey(await retrievePublicKey());
+            console.log(publicKey);
     }
-    useEffect(() => {
-    connectWallet()
-  }, [])
+
+    await axios.post(`${BACKEND_URL}/signin`,{
+      data : {
+        walletAddress : publicKey
+      }
+    })
+   }
+      
+      
 
  
 
@@ -53,4 +41,5 @@ export const Appbar = () => {
       <Button onclick={connectWallet} text="Connect Wallet" />
     </div>
   )
+
 }
