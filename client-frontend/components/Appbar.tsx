@@ -24,17 +24,10 @@ export const Appbar = () => {
             console.log(publicKey);
     }
 
-    await axios.post(`${BACKEND_URL}/signin`,{
-      data : {
-        walletAddress : publicKey
-      }
-    })
+    await axios.post(`${BACKEND_URL}/signin`)
    }
       
-      
-
- 
-
+    
   
   return (
     <div>

@@ -18,7 +18,6 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const client_1 = require("@prisma/client");
 const prisma = new client_1.PrismaClient();
 const __1 = require("..");
-const worker_1 = require("../middlewares/worker");
 const db_1 = require("../db");
 const TOTAL_SUBMISSIONS = 100;
 router.post("/signin", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -53,7 +52,7 @@ router.post("/signin", (req, res) => __awaiter(void 0, void 0, void 0, function*
         });
     }
 }));
-router.get("/nextBid", worker_1.workerMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get("/nextBid", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const workerId = req.body.workerId;
     const bid = (0, db_1.getNextBid)(workerId);
     if (!bid) {
@@ -73,7 +72,7 @@ router.get("/nextBid", worker_1.workerMiddleware, (req, res) => __awaiter(void 0
     }
 }));
 //submission
-router.post("/submission", worker_1.workerMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post("/submission", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const body = req.body;
     const workerId = req.body.workerId;
     const bid = yield (0, db_1.getNextBid)(workerId);
@@ -82,37 +81,37 @@ router.post("/submission", worker_1.workerMiddleware, (req, res) => __awaiter(vo
             message: "Invalid bid"
         });
     }
-    const pool = bid.price / 10;
-    const amount = pool / TOTAL_SUBMISSIONS;
-    const submission = prisma.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
-        const submission = yield tx.submission.create({
-            data: {
-                answer: req.body.answer,
-                workerId: workerId,
-                //@ts-ignore
-                bidId: bid.id,
-                //@ts-ignore
-                amount: amount
-            }
-        });
-        yield tx.worker.update({
-            where: {
-                id: workerId
-            },
-            data: {
-                pendingAmount: {
-                    increment: amount
-                }
-            }
-        });
-        return submission;
-    }));
+    // const pool = bid.price / 10
+    // const amount = pool / TOTAL_SUBMISSIONS
+    // const submission = prisma.$transaction(async tx => {
+    //     const submission = await tx.submission.create({
+    //         data : {
+    //             answer : req.body.answer,
+    //             workerId : workerId,
+    //             //@ts-ignore
+    //             bidId : bid.id,
+    //             //@ts-ignore
+    //             amount : amount
+    //         }
+    //     })
+    //     await tx.worker.update({
+    //         where : {
+    //             id : workerId
+    //         },
+    //         data : {
+    //             pendingAmount : {
+    //                 increment : amount
+    //             }
+    //         }
+    //     })
+    //     return submission
+    // })
     const nextBid = yield (0, db_1.getNextBid)(workerId);
     res.json({
         nextBid,
     });
 }));
-router.get("/balance", worker_1.workerMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get("/balance", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const workerId = req.body.workerId;
     const worker = yield prisma.worker.findFirst({
         where: {
@@ -126,7 +125,7 @@ router.get("/balance", worker_1.workerMiddleware, (req, res) => __awaiter(void 0
         lockedAmount: worker.lockedAmount
     });
 }));
-router.post("/payout", worker_1.workerMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post("/payout", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     // @ts-ignore
     const workerId = req.workerId;
     const worker = yield prisma.worker.findFirst({

@@ -36,8 +36,7 @@ export const Project = () => {
           description={project.description}
           // @ts-ignore
           price={project.price}
-          // @ts-ignore
-          deadline={project.deadline}
+          
         />
       ))}
       

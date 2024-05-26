@@ -15,11 +15,7 @@ const Card = ({id,maxVotes} : CardProps) => {
     const projectId = useRecoilValue(projectIdAtom)
     
     const handleClick = async () => {
-        const response = await axios.put(`${BACKEND_URL}/selectBid`,{
-            data : {
-                bidId : id
-            }
-        })
+        
     }
 
     
@@ -31,7 +27,7 @@ const Card = ({id,maxVotes} : CardProps) => {
     <p className="mb-3 font-normal text-gray-700 ">{maxVotes}</p>
     
 
-   <Button onclick ={handleClick} text='Select Bid'/>
+   <Button onclick ={handleClick} text='Show Votes'/>
 </div>
 
     );

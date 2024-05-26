@@ -22,6 +22,7 @@ export const Appbar = () => {
             getConnected("Connected");
             getPublicKey(await retrievePublicKey());
             console.log(publicKey);
+            console.log("hi")
     }
 
     await axios.post(`${BACKEND_URL}/signin`,{

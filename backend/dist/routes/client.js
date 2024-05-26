@@ -18,9 +18,8 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const client_1 = require("@prisma/client");
 const prisma = new client_1.PrismaClient();
 const __1 = require("..");
-const client_2 = require("../middlewares/client");
-router.post("/signin/:walletAddress", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const walletAddress = req.params.walletAddress;
+router.post("/signin", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const walletAddress = "hdbdjhsuydyufy";
     const existingclient = yield prisma.client.findFirst({
         where: {
             address: walletAddress
@@ -49,8 +48,8 @@ router.post("/signin/:walletAddress", (req, res) => __awaiter(void 0, void 0, vo
         });
     }
 }));
-router.post("/projects", client_2.clientMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { title, description, price, Deadline } = req.body;
+router.post("/projects", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { title, description, price } = req.body;
     //@ts-ignore
     const clientId = req.clientId;
     const project = yield prisma.project.create({
@@ -59,13 +58,12 @@ router.post("/projects", client_2.clientMiddleware, (req, res) => __awaiter(void
             clientId,
             title,
             description,
-            price,
-            Deadline,
+            price
         }
     });
     res.json(project);
 }));
-router.get("/myProjects", client_2.clientMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get("/myProjects", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     //@ts-ignore
     const clientId = req.clientId;
     const projects = yield prisma.project.findMany({
@@ -75,7 +73,7 @@ router.get("/myProjects", client_2.clientMiddleware, (req, res) => __awaiter(voi
     });
     res.json(projects);
 }));
-router.get("/bids", client_2.clientMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get("/bids", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const projectId = Number(req.query.projectId);
     const bids = yield prisma.bid.findMany({
         where: {
@@ -83,5 +81,21 @@ router.get("/bids", client_2.clientMiddleware, (req, res) => __awaiter(void 0, v
         }
     });
     res.json(bids);
+}));
+//select bid
+router.put("/selectBid", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { bidId } = req.body;
+    //@ts-ignore
+    const clientId = req.clientId;
+    const bid = yield prisma.bid.findFirst({
+        where: {
+            id: bidId
+        },
+        //@ts-ignore
+        update: {
+            accepted: true
+        }
+    });
+    res.json(bid);
 }));
 exports.default = router;

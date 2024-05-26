@@ -19,7 +19,6 @@ model Project{
   title    String
   description String
   price    Int
-  Deadline Int
   assigned Boolean @default(false)
   done Boolean @default(false)
   bid Bid[]
@@ -39,7 +38,9 @@ model Bid{
   projectId Int
   project  Project   @relation(fields: [projectId], references: [id])
   freelancerId Int
-  maxVote Boolean
+  yes Int
+  no Int
+
   done Boolean @default(false)
   freelancer Freelancer   @relation(fields: [freelancerId], references: [id])
   submission Submission[]

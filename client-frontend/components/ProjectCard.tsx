@@ -9,10 +9,9 @@ interface CardProps {
     title: string;
     description: string;
     price: number;
-    deadline : string
 }
 
-const Card = ({title , description , price, deadline} : CardProps) => {
+const Card = ({title , description , price} : CardProps) => {
     const projectId = useRecoilValue(projectIdAtom)
     
     const handleClick = async () => {
@@ -31,7 +30,6 @@ const Card = ({title , description , price, deadline} : CardProps) => {
     
     <p className="mb-3 font-normal text-gray-700 ">{description}</p>
     <p className='text-sm font-medium'>{price}</p>
-    <p className='text-sm font-medium'>{deadline}</p>
 
    <Button onclick ={handleClick} text='See All Bids'/>
 </div>

@@ -4,11 +4,10 @@ import jwt from "jsonwebtoken"
 import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 import { JWT_SECRET } from '..';
-import { clientMiddleware } from '../middlewares/client';
 import { Token } from 'aws-sdk';
 
 router.post("/signin",async  (req, res) => {
-    const walletAddress = req.body as string
+    const walletAddress = "hdbdjhsuydyufy" 
    
    const existingclient = await prisma.client.findFirst({
     where: {
@@ -44,8 +43,8 @@ router.post("/signin",async  (req, res) => {
 
 })
 
-router.post("/projects",clientMiddleware,async (req, res) => {
-    const {title,description,price,Deadline} = req.body
+router.post("/projects",  async (req, res) => {
+    const {title,description,price } = req.body
     //@ts-ignore
     const clientId = req.clientId
     const project = await prisma.project.create({
@@ -55,14 +54,14 @@ router.post("/projects",clientMiddleware,async (req, res) => {
             clientId,
             title,
             description,
-            price,
-            Deadline,      
+            price
+                
         }
     })
     res.json(project)
 })
 
-router.get("/myProjects",clientMiddleware,async (req, res) => {
+router.get("/myProjects",  async (req, res) => {
     //@ts-ignore
     const clientId = req.clientId
     const projects = await prisma.project.findMany({
@@ -74,7 +73,7 @@ router.get("/myProjects",clientMiddleware,async (req, res) => {
     res.json(projects)
 })
 
-router.get("/bids", clientMiddleware, async (req, res) => {
+router.get("/bids",    async (req, res) => {
     const projectId = Number(req.query.projectId);
 
     const bids = await prisma.bid.findMany({
@@ -87,7 +86,7 @@ router.get("/bids", clientMiddleware, async (req, res) => {
 });
 
 //select bid
-router.put("/selectBid", clientMiddleware, async (req, res) => {
+router.put("/selectBid",    async (req, res) => {
     const {bidId} = req.body
     //@ts-ignore
     const clientId = req.clientId

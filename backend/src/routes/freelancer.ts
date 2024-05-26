@@ -4,7 +4,6 @@ import jwt from "jsonwebtoken"
 import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 import { JWT_SECRET } from '..';
-import { freelancerMiddleware } from '../middlewares/freelancer';
 
 router.post("/signin",async  (req, res) => {
     const walletAddress = "0xf76daC24BaEf645ee0b3dfAc1997c6b838eF280D"
@@ -53,8 +52,8 @@ router.get("/availableProjects",async (req, res) => {
 })
 
 //select project
-router.get("/selectProject",freelancerMiddleware ,async (req, res) => {
-    const {title,description,price,deadline} = req.body
+router.get("/selectProject",  async (req, res) => {
+    const {title,description,price, } = req.body
     //@ts-ignore
     const freelancerId = req.freelancerId
     const project = await prisma.project.findFirst({
@@ -63,7 +62,7 @@ router.get("/selectProject",freelancerMiddleware ,async (req, res) => {
                 description,
                 price,
                 // @ts-ignore
-                deadline 
+                  
         }
         
     })
@@ -71,7 +70,7 @@ router.get("/selectProject",freelancerMiddleware ,async (req, res) => {
 })
 
 //post bid
-router.post("/bid",freelancerMiddleware ,async (req, res) => {
+router.post("/bid",  async (req, res) => {
     const {projectId,repo} = req.body
     //@ts-ignore
     const freelancerId = req.freelancerId

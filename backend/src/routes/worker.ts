@@ -4,7 +4,6 @@ import jwt from "jsonwebtoken"
 import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 import { JWT_SECRET } from '..';
-import { workerMiddleware } from '../middlewares/worker';
 import { getNextBid } from '../db';
 
 const TOTAL_SUBMISSIONS = 100
@@ -46,7 +45,7 @@ router.post("/signin",async  (req, res) => {
    }
 })
 
-router.get("/nextBid",workerMiddleware ,async (req, res) => {
+router.get("/nextBid",  async (req, res) => {
     const workerId = req.body.workerId
 
 
@@ -73,7 +72,7 @@ if(!bid){
 
 
 //submission
-router.post("/submission",workerMiddleware ,async (req, res) => {
+router.post("/submission",  async (req, res) => {
    const body = req.body
 
     const workerId = req.body.workerId
@@ -87,36 +86,36 @@ router.post("/submission",workerMiddleware ,async (req, res) => {
 
     }
 
-    const pool = bid.price / 10
+    // const pool = bid.price / 10
 
-    const amount = pool / TOTAL_SUBMISSIONS
+    // const amount = pool / TOTAL_SUBMISSIONS
 
-    const submission = prisma.$transaction(async tx => {
-        const submission = await tx.submission.create({
-            data : {
-                answer : req.body.answer,
-                workerId : workerId,
-                //@ts-ignore
-                bidId : bid.id,
-                //@ts-ignore
-                amount : amount
-            }
-        })
+    // const submission = prisma.$transaction(async tx => {
+    //     const submission = await tx.submission.create({
+    //         data : {
+    //             answer : req.body.answer,
+    //             workerId : workerId,
+    //             //@ts-ignore
+    //             bidId : bid.id,
+    //             //@ts-ignore
+    //             amount : amount
+    //         }
+    //     })
 
-        await tx.worker.update({
-            where : {
-                id : workerId
-            },
-            data : {
-                pendingAmount : {
-                    increment : amount
-                }
-            }
-        })
+    //     await tx.worker.update({
+    //         where : {
+    //             id : workerId
+    //         },
+    //         data : {
+    //             pendingAmount : {
+    //                 increment : amount
+    //             }
+    //         }
+    //     })
         
 
-        return submission
-    })
+    //     return submission
+    // })
 
     
 
@@ -127,7 +126,7 @@ router.post("/submission",workerMiddleware ,async (req, res) => {
     })
 })
 
-router.get("/balance",workerMiddleware ,async (req, res) => {
+router.get("/balance",  async (req, res) => {
     const workerId = req.body.workerId
 
     const worker = await prisma.worker.findFirst({
@@ -144,7 +143,7 @@ lockedAmount : worker.lockedAmount
     })
 })
 
-router.post("/payout",workerMiddleware ,async (req, res) => {
+router.post("/payout",  async (req, res) => {
     // @ts-ignore
     const workerId = req.workerId
     const worker = await prisma.worker.findFirst({

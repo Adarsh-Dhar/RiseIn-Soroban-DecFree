@@ -2,19 +2,18 @@
 import React from 'react';
 import Button from './Button';
 import { RecoilRoot, useRecoilValue, useSetRecoilState } from 'recoil';
-import { deadlineAtom, descriptionAtom, priceAtom, titleAtom } from '@/store/atoms/Products';
+import {  descriptionAtom, priceAtom, titleAtom } from '@/store/atoms/Products';
 import axios from 'axios';
 import { BACKEND_URL } from '@/utils';
 
 const Project = () => {
 
-    const handleClick = () => {
+    const handleClick = async () => {
       try{
-        const response = axios.post(`${BACKEND_URL}/projects`,{
+        const response = await axios.post(`${BACKEND_URL}/projects`,{
           title,
           description,
           price,
-          deadline
       })
 
       console.log(response)
@@ -30,8 +29,7 @@ const Project = () => {
     const setDescription = useSetRecoilState(descriptionAtom);
     const price = useRecoilValue(priceAtom);
     const setPrice = useSetRecoilState(priceAtom);
-    const deadline = useRecoilValue(deadlineAtom);
-    const setDeadline = useSetRecoilState(deadlineAtom);
+  
     return (
         <div className="flex items-center justify-center h-screen">
         <div className="flex flex-col space-y-6">
@@ -86,21 +84,7 @@ const Project = () => {
             </label>
           </div>
       
-          <div className="relative">
-          <input
-            type="date"
-            id="deadline"
-            className="border-b py-1 focus:outline-none focus:border-purple-600 focus:border-b-2 transition-colors peer"
-            autoComplete="off"
-            value={deadline.toString()} // Convert deadline to string
-            onChange={(e) => setDeadline(new Date(e.target.value))}
-          />
-     <label
-        htmlFor="deadline"
-        className="ml-2 text-gray-600 peer-focus:text-purple-600 transition-colors"
-        >
-        Deadline
-        </label>
+          
         <div className="relative">
 
         <Button onclick={handleClick} text='publish project'/>
@@ -108,7 +92,7 @@ const Project = () => {
 
           </div>
         </div>
-      </div>
+      
     );
 };
 
