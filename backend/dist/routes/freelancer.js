@@ -18,11 +18,12 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const client_1 = require("@prisma/client");
 const prisma = new client_1.PrismaClient();
 const __1 = require("..");
+const freelancer_1 = require("../middlewares/freelancer");
 router.post("/signin", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const walletAddress = "0xf76daC24BaEf645ee0b3dfAc1997c6b838eF280D";
+    const { publicKey } = req.body;
     const existingfreelancer = yield prisma.freelancer.findFirst({
         where: {
-            address: walletAddress
+            address: publicKey
         }
     });
     if (existingfreelancer) {
@@ -37,7 +38,7 @@ router.post("/signin", (req, res) => __awaiter(void 0, void 0, void 0, function*
         const freelancer = yield prisma.freelancer.create({
             // @ts-ignore
             data: {
-                address: walletAddress,
+                address: publicKey,
             }
         });
         const token = jsonwebtoken_1.default.sign({
@@ -49,7 +50,7 @@ router.post("/signin", (req, res) => __awaiter(void 0, void 0, void 0, function*
     }
 }));
 //get all projects
-router.get("/availableProjects", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get("/availableProjects", freelancer_1.freelancerMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const projects = yield prisma.project.findMany({
         where: {
             assigned: false
@@ -58,8 +59,8 @@ router.get("/availableProjects", (req, res) => __awaiter(void 0, void 0, void 0,
     res.json(projects);
 }));
 //select project
-router.get("/selectProject", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { title, description, price, } = req.body;
+router.get("/selectProject", freelancer_1.freelancerMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { title, description, price } = req.body;
     //@ts-ignore
     const freelancerId = req.freelancerId;
     const project = yield prisma.project.findFirst({
@@ -73,7 +74,7 @@ router.get("/selectProject", (req, res) => __awaiter(void 0, void 0, void 0, fun
     res.json(project === null || project === void 0 ? void 0 : project.id);
 }));
 //post bid
-router.post("/bid", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post("/bid", freelancer_1.freelancerMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { projectId, repo } = req.body;
     //@ts-ignore
     const freelancerId = req.freelancerId;
@@ -84,6 +85,8 @@ router.post("/bid", (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             freelancerId: freelancerId,
             accepted: false,
             repo: repo,
+            yesCount: 0,
+            noCount: 0,
         }
     });
     res.json(bid);

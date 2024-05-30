@@ -8,10 +8,12 @@ import { BACKEND_URL } from "@/utils"
 import { get } from "http"
 import { publicKeyAtom } from "@/store/atoms/Key";
 import { useRecoilValue, useSetRecoilState } from "recoil";
+import { tokenAtom } from "@/store/atoms/Tokens"
 
 export const Appbar = () => {
   const publicKey = useRecoilValue(publicKeyAtom)
   const getPublicKey = useSetRecoilState(publicKeyAtom)
+  const setToken = useSetRecoilState(tokenAtom)
   const [connect, getConnected] = useState("Connect")
  
 
@@ -24,17 +26,14 @@ export const Appbar = () => {
             console.log(publicKey);
     }
 
-    await axios.post(`${BACKEND_URL}/signin`,{
-      data : {
-        walletAddress : publicKey
-      }
+    const response = await axios.post(`${BACKEND_URL}/signin`,{
+        publicKey
     })
+
+    setToken(response.data)
    }
       
-      
-
- 
-
+    
   
   return (
     <div>

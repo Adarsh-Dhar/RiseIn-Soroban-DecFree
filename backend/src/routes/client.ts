@@ -5,13 +5,14 @@ import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 import { JWT_SECRET } from '..';
 import { Token } from 'aws-sdk';
+import { clientMiddleware } from '../middlewares/client';
 
 router.post("/signin",async  (req, res) => {
-    const walletAddress = "hdbdjhsuydyufy" 
+    const {publicKey} = req.body 
    
    const existingclient = await prisma.client.findFirst({
     where: {
-        address : walletAddress
+        address : publicKey
 
     }
    })
@@ -28,7 +29,7 @@ router.post("/signin",async  (req, res) => {
     const client = await prisma.client.create({
         // @ts-ignore
         data: {
-            address : walletAddress,
+            address : publicKey,
             
         }
     })
@@ -43,7 +44,7 @@ router.post("/signin",async  (req, res) => {
 
 })
 
-router.post("/projects",  async (req, res) => {
+router.post("/projects",clientMiddleware,  async (req, res) => {
     const {title,description,price } = req.body
     //@ts-ignore
     const clientId = req.clientId
@@ -51,17 +52,21 @@ router.post("/projects",  async (req, res) => {
         
         // @ts-ignore
         data: {
-            clientId,
             title,
             description,
-            price
+            price,
+            client : {
+                connect : {
+                    id : clientId
+                }
+            }
                 
         }
     })
     res.json(project)
 })
 
-router.get("/myProjects",  async (req, res) => {
+router.get("/myProjects", clientMiddleware, async (req, res) => {
     //@ts-ignore
     const clientId = req.clientId
     const projects = await prisma.project.findMany({
@@ -73,8 +78,8 @@ router.get("/myProjects",  async (req, res) => {
     res.json(projects)
 })
 
-router.get("/bids",    async (req, res) => {
-    const projectId = Number(req.query.projectId);
+router.get("/bids", clientMiddleware,   async (req, res) => {
+    const {projectId} = req.body;
 
     const bids = await prisma.bid.findMany({
         where: {
@@ -86,16 +91,16 @@ router.get("/bids",    async (req, res) => {
 });
 
 //select bid
-router.put("/selectBid",    async (req, res) => {
+router.put("/selectBid", clientMiddleware,   async (req, res) => {
     const {bidId} = req.body
     //@ts-ignore
     const clientId = req.clientId
-    const bid = await prisma.bid.findFirst({
+    const bid = await prisma.bid.update({
         where: {
             id: bidId
         },
         //@ts-ignore
-        update : {
+        data : {
             accepted : true
         }
     })

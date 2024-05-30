@@ -1,8 +1,9 @@
 "use client"
 import Image from "next/image";
 import {Appbar} from "../components/Appbar";
-import Decision from "../components/Decision";
 import { RecoilRoot } from "recoil";
+import {NextBid} from "../components/NextBid";
+import { Voting } from "@/components/Voting";
 
 export default function Home() {
   return (
@@ -10,7 +11,9 @@ export default function Home() {
    <div>
     <RecoilRoot>
     <Appbar />
-    <Decision />
+    <NextBid />
+    <Voting />
+   
     </RecoilRoot>
    </div>
   );

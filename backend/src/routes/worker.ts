@@ -4,16 +4,16 @@ import jwt from "jsonwebtoken"
 import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 import { JWT_SECRET } from '..';
-import { getNextBid } from '../db';
+import { workerMiddleware } from '../middlewares/worker';
 
 const TOTAL_SUBMISSIONS = 100
 
 router.post("/signin",async  (req, res) => {
-    const walletAddress = "0xf76daC24BaEf645ee0b3dfAc1997c6b838eF280D"
+    const {publicKey} = req.body 
    
    const existingworker = await prisma.worker.findFirst({
     where: {
-        address : walletAddress
+        address : publicKey
 
     }
    })
@@ -30,9 +30,8 @@ router.post("/signin",async  (req, res) => {
     const worker = await prisma.worker.create({
         // @ts-ignore
         data: {
-            address : walletAddress,
-            pendingAmount : 0,
-            lockedAmount : 0
+            address : publicKey,
+            
         }
     })
     const token = jwt.sign({
@@ -43,13 +42,19 @@ router.post("/signin",async  (req, res) => {
         token
     })
    }
+
 })
 
-router.get("/nextBid",  async (req, res) => {
-    const workerId = req.body.workerId
+router.get("/nextBid", workerMiddleware, async (req, res) => {
+    // @ts-ignore
+    const workerId = req.workerId
 
 
-    const bid = getNextBid(workerId)
+    const bid = await prisma.bid.findFirst({
+        where : {
+            done : false
+        }
+    })
     if(!bid){
         return res.status(400).json({
             message : "No more bid for you to review"
@@ -61,9 +66,9 @@ if(!bid){
        message : "No more bid for you to review"
     })
 }else{
-    res.json({
+    res.json(
         bid
-    })
+    )
 }
     
 })
@@ -72,121 +77,121 @@ if(!bid){
 
 
 //submission
-router.post("/submission",  async (req, res) => {
-   const body = req.body
+// router.post("/submission",workerMiddleware,  async (req, res) => {
+//    const body = req.body
 
-    const workerId = req.body.workerId
+//     const workerId = req.body.workerId
 
-    const bid = await getNextBid(workerId)
-    if(!bid || bid.id !== body.bidId){
-        return res.status(400).json({
-            message : "Invalid bid"
-        })
+//     const bid = await getNextBid(workerId)
+//     if(!bid || bid.id !== body.bidId){
+//         return res.status(400).json({
+//             message : "Invalid bid"
+//         })
 
 
-    }
+//     }
 
-    // const pool = bid.price / 10
+//     // const pool = bid.price / 10
 
-    // const amount = pool / TOTAL_SUBMISSIONS
+//     // const amount = pool / TOTAL_SUBMISSIONS
 
-    // const submission = prisma.$transaction(async tx => {
-    //     const submission = await tx.submission.create({
-    //         data : {
-    //             answer : req.body.answer,
-    //             workerId : workerId,
-    //             //@ts-ignore
-    //             bidId : bid.id,
-    //             //@ts-ignore
-    //             amount : amount
-    //         }
-    //     })
+//     // const submission = prisma.$transaction(async tx => {
+//     //     const submission = await tx.submission.create({
+//     //         data : {
+//     //             answer : req.body.answer,
+//     //             workerId : workerId,
+//     //             //@ts-ignore
+//     //             bidId : bid.id,
+//     //             //@ts-ignore
+//     //             amount : amount
+//     //         }
+//     //     })
 
-    //     await tx.worker.update({
-    //         where : {
-    //             id : workerId
-    //         },
-    //         data : {
-    //             pendingAmount : {
-    //                 increment : amount
-    //             }
-    //         }
-    //     })
+//     //     await tx.worker.update({
+//     //         where : {
+//     //             id : workerId
+//     //         },
+//     //         data : {
+//     //             pendingAmount : {
+//     //                 increment : amount
+//     //             }
+//     //         }
+//     //     })
         
 
-    //     return submission
-    // })
+//     //     return submission
+//     // })
 
     
 
-    const nextBid = await getNextBid(workerId)
-    res.json({
-        nextBid,
+//     const nextBid = await getNextBid(workerId)
+//     res.json({
+//         nextBid,
         
-    })
-})
+//     })
+// })
 
-router.get("/balance",  async (req, res) => {
-    const workerId = req.body.workerId
+// router.get("/balance",workerMiddleware,  async (req, res) => {
+//     const workerId = req.body.workerId
 
-    const worker = await prisma.worker.findFirst({
-        where : {
-            id : workerId
-        }
-    })
+//     const worker = await prisma.worker.findFirst({
+//         where : {
+//             id : workerId
+//         }
+//     })
 
-    res.json({
-        //@ts-ignore
-        pendingAmount : worker.pendingAmount,
-        //@ts-ignore
-lockedAmount : worker.lockedAmount
-    })
-})
+//     res.json({
+//         //@ts-ignore
+//         pendingAmount : worker.pendingAmount,
+//         //@ts-ignore
+// lockedAmount : worker.lockedAmount
+//     })
+// })
 
-router.post("/payout",  async (req, res) => {
-    // @ts-ignore
-    const workerId = req.workerId
-    const worker = await prisma.worker.findFirst({
-        where : {
-            id : Number(workerId)
-        }
-    })
+// router.post("/payout",  async (req, res) => {
+//     // @ts-ignore
+//     const workerId = req.workerId
+//     const worker = await prisma.worker.findFirst({
+//         where : {
+//             id : Number(workerId)
+//         }
+//     })
 
-    if(!worker) {
-        return res.status(400).json({
-            message : "Invalid worker"
-        })
-    }
+//     if(!worker) {
+//         return res.status(400).json({
+//             message : "Invalid worker"
+//         })
+//     }
 
-    const address = worker.address
+//     const address = worker.address
 
-    const txId = "0x1234567890"
+//     const txId = "0x1234567890"
 
-    await prisma.$transaction(async tx => {
-        await tx.worker.update({
-            where : {
-                id : workerId
-            },
-            data : {
-                pendingAmount : {
-                    decrement : worker.pendingAmount
-                },
-                lockedAmount : {
-                    increment : worker.pendingAmount
-            }
-        }
-        })
+//     await prisma.$transaction(async tx => {
+//         await tx.worker.update({
+//             where : {
+//                 id : workerId
+//             },
+//             data : {
+//                 pendingAmount : {
+//                     decrement : worker.pendingAmount
+//                 },
+//                 lockedAmount : {
+//                     increment : worker.pendingAmount
+//             }
+//         }
+//         })
 
-        await tx.payouts.create({
-            data : {
-                amount : worker.pendingAmount,
-                signature : txId,
-                workerId : workerId,
-                status : "PENDING"
-            }
-        })
-    })
-})
+//         await tx.payouts.create({
+//             data : {
+//                 amount : worker.pendingAmount,
+//                 signature : txId,
+//                 workerId : workerId,
+//                 status : "PENDING"
+//             }
+//         })
+//     })
+// })
 
 
 export default router;

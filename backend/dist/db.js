@@ -17,8 +17,11 @@ const getNextBid = (userId) => __awaiter(void 0, void 0, void 0, function* () {
         where: {
             done: false,
             // @ts-ignore
-            none: {
-                workerId: userId,
+            submission: {
+                none: {
+                    // @ts-ignore
+                    workerId: userId,
+                }
             }
         },
         select: {

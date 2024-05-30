@@ -1,25 +1,39 @@
 "use client"
-import React from 'react';
+import React, { useEffect } from 'react';
 import Button from './Button';
 import { RecoilRoot, useRecoilValue, useSetRecoilState } from 'recoil';
 import {  descriptionAtom, priceAtom, titleAtom } from '@/store/atoms/Products';
 import axios from 'axios';
 import { BACKEND_URL } from '@/utils';
+import { tokenAtom } from '@/store/atoms/Tokens';
 
 const Project = () => {
+  const token = useRecoilValue(tokenAtom)
+  // @ts-ignore
+  const tokenData = token.token
 
     const handleClick = async () => {
+      
+
       try{
         const response = await axios.post(`${BACKEND_URL}/projects`,{
           title,
           description,
-          price,
+          price : parseInt(price),
+      },{
+        headers: {
+          Authorization: tokenData
+        }
+      
       })
-
-      console.log(response)
+      console.log(response.data)
       }catch(error){
         console.log(error)
       }
+
+      useEffect(() => {
+        handleClick()
+      },[title,description,price,token])
         
         
     }

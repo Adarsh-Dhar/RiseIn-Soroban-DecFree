@@ -13,7 +13,6 @@ interface CardProps {
 }
 
 const Card = ({title , description , price, deadline} : CardProps) => {
-    const projectId = useRecoilValue(projectIdAtom)
     const setProjectId = useSetRecoilState(projectIdAtom)
     const handleClick = async () => {
         const response = await axios.post(`${BACKEND_URL}/selectProject`,{
@@ -21,7 +20,7 @@ const Card = ({title , description , price, deadline} : CardProps) => {
                 title : title,
                 description : description,
                 price : price,
-                deadline : deadline
+                
             }
         })
         setProjectId(response.data)

@@ -67,9 +67,9 @@ async function contractInt(caller : any, functName : any, values : any) {
     }
 }
 
-async function fetchPoll() {
-    let caller = await getPublicKey();
+async function fetchPoll(caller : String) {
     let result = await contractInt(caller, 'view_poll', null);
+    console.log(result)
     //@ts-ignore
     let no = (result._value[0]._attributes.val._value).toString();
     //@ts-ignore
@@ -81,8 +81,7 @@ async function fetchPoll() {
     return [no, total, yes]
 }
 
-async function fetchVoter() {
-    let caller = await getPublicKey();
+async function fetchVoter(caller : String) {
     let voter = accountToScVal(caller);
     let result = await contractInt(caller, 'view_voter', [voter]);
     //@ts-ignore

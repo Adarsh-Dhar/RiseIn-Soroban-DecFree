@@ -32,15 +32,12 @@ model Project{
 model Bid{
   id      Int  @id @default(autoincrement())
   repo     String
-  
-  
   accepted Boolean @default(false)
   projectId Int
   project  Project   @relation(fields: [projectId], references: [id])
+  yesCount Int
+  noCount Int
   freelancerId Int
-  yes Int
-  no Int
-
   done Boolean @default(false)
   freelancer Freelancer   @relation(fields: [freelancerId], references: [id])
   submission Submission[]
@@ -67,8 +64,6 @@ model Worker{
   address   String
   submission Submission[]
   
-  pendingAmount Int
-  lockedAmount Int
   payout Payouts[]
 }
 

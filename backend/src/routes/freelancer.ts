@@ -4,13 +4,14 @@ import jwt from "jsonwebtoken"
 import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 import { JWT_SECRET } from '..';
+import { freelancerMiddleware } from '../middlewares/freelancer';
 
 router.post("/signin",async  (req, res) => {
-    const walletAddress = "0xf76daC24BaEf645ee0b3dfAc1997c6b838eF280D"
+    const {publicKey} = req.body 
    
    const existingfreelancer = await prisma.freelancer.findFirst({
     where: {
-        address : walletAddress
+        address : publicKey
 
     }
    })
@@ -27,7 +28,7 @@ router.post("/signin",async  (req, res) => {
     const freelancer = await prisma.freelancer.create({
         // @ts-ignore
         data: {
-            address : walletAddress,
+            address : publicKey,
             
         }
     })
@@ -39,10 +40,11 @@ router.post("/signin",async  (req, res) => {
         token
     })
    }
+
 })
 
 //get all projects
-router.get("/availableProjects",async (req, res) => {
+router.get("/availableProjects",freelancerMiddleware, async (req, res) => {
     const projects = await prisma.project.findMany({
         where : {
             assigned : false
@@ -52,8 +54,8 @@ router.get("/availableProjects",async (req, res) => {
 })
 
 //select project
-router.get("/selectProject",  async (req, res) => {
-    const {title,description,price, } = req.body
+router.get("/selectProject", freelancerMiddleware, async (req, res) => {
+    const {title,description,price } = req.body
     //@ts-ignore
     const freelancerId = req.freelancerId
     const project = await prisma.project.findFirst({
@@ -70,7 +72,7 @@ router.get("/selectProject",  async (req, res) => {
 })
 
 //post bid
-router.post("/bid",  async (req, res) => {
+router.post("/bid", freelancerMiddleware, async (req, res) => {
     const {projectId,repo} = req.body
     //@ts-ignore
     const freelancerId = req.freelancerId
@@ -82,10 +84,9 @@ router.post("/bid",  async (req, res) => {
             freelancerId : freelancerId,
             accepted : false,
             repo : repo,
-            
-            
-            
-        }
+            yesCount : 0,
+            noCount : 0,
+              }
     })
     res.json(bid)
 })
